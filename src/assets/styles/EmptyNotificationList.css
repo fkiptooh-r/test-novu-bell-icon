@@ -1,0 +1,25 @@
+.empty-notification-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    text-align: center;
+  }
+  
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+  
+  .empty-notification-list h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  
+  .empty-notification-list p {
+    color: #666;
+    font-size: 14px;
+  }
+  
+  
