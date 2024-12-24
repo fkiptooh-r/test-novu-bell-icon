@@ -17,7 +17,7 @@ export const NotificationSystem: React.FC = () => {
         <div className="notification-dialog">
           <Inbox />
         </div>
-      )}
+       )}
     </div>
   );
 };

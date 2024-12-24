@@ -1,13 +1,41 @@
-import React from 'react';
-import { useNotifications } from '@novu/react/hooks';
-
+import React, { useEffect, useState } from 'react';
+import { useNovu } from '../context/novu-context';
 interface BellButtonProps {
   onClick: () => void;
 }
 
 export const BellButton: React.FC<BellButtonProps> = ({ onClick }) => {
-  const { notifications } = useNotifications();
-  const unreadCount = notifications?.filter(notification => !notification.isRead).length ?? 0;
+  const novu = useNovu(); // Access the Novu instance via the custom hook
+  const [count, setCount] = useState<number>(0);
+
+  // novu.on("notifications.unread_count_changed", (data) => {
+  //   console.log("new unread notifications count =>", data);
+  // });
+
+
+  useEffect(() => {
+    const fetchNotificationCount = async () => {
+      try {
+        const response = await novu.notifications.count({ read: false, archived: false });
+        setCount(response.data?.count ?? 0);
+      } catch (error) {
+        console.error('Error fetching notification count:', error);
+      }
+    };
+
+    fetchNotificationCount();
+
+    // Add a listener for unread count changes
+    const cleanup = novu.on('notifications.unread_count_changed', (newCount) => {
+      console.log('New unread count:', newCount);
+      setCount(newCount.result);
+    });
+
+    // Cleanup the listener when the component unmounts
+    return () => {
+      cleanup();
+    };
+  }, [novu]);
 
   return (
     <button 
@@ -18,8 +46,8 @@ export const BellButton: React.FC<BellButtonProps> = ({ onClick }) => {
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
       </svg>
-      {unreadCount > 0 && (
-        <span className="notification-badge">{unreadCount}</span>
+      {count > 0 && (
+        <span className="notification-badge">{count}</span>
       )}
     </button>
   );
