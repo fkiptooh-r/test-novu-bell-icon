@@ -2,15 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import '../assets/styles/Inbox.css';
 import '../assets/styles/Notifications.css';
+import '../assets/styles/Prefences.css';
 import { NotificationsList } from './notification-list';
 import { InboxNotification, ListNotificationsResponse } from '@novu/js';
 import { useNovu } from '../context/novu-context';
+import { PreferencesDialog } from './preference-dialog';
+import { Settings } from 'lucide-react';
 
-// 
 type TabType = 'unread' | 'read' | 'archived';
 
-// const preferenceData = await novu.preferences.list();
-// console.log(preferenceData.data);
 export const Inbox: React.FC = () => {
   const novu = useNovu();
   novu.on("notifications.notification_received", (data) => {
@@ -18,6 +18,9 @@ export const Inbox: React.FC = () => {
   });
   
   const [notifications, setNotifications] = useState<any[]>([]);
+  // preferences
+  const [preferences, setPreferences] = useState<any[]>([])
+  const [showPreferences, setShowPreferences] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('read');
@@ -29,6 +32,7 @@ export const Inbox: React.FC = () => {
       const response = await novu.notifications.list({
         limit,
       });
+
       const { notifications: fetchedNotifications, hasMore: moreAvailable } = response.data as ListNotificationsResponse;
 
       setNotifications(fetchedNotifications); // Replace old notifications with fresh ones
@@ -39,6 +43,15 @@ export const Inbox: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  const fetchPreferences = async () => {
+    try {
+      const sharedPreferences = await novu.preferences.list()
+      setPreferences(sharedPreferences.data as any[])
+    } catch (error) {
+      console.error('Error fetching preferences:', error)
+    }
+  }
 
   const fetchMore = async () => {
     if (hasMore && !isLoading) {
@@ -61,10 +74,11 @@ export const Inbox: React.FC = () => {
 
   useEffect(() => {
     fetchNotifications();
+    fetchPreferences();
 
     // Add a listener for new notifications
     const cleanup = novu.on('notifications.notification_received', (newNotification) => {
-      console.log('New notification received:', newNotification);
+      // console.log('New notification received:', newNotification);
       setNotifications((prev) => [newNotification, ...prev]);
     });
 
@@ -97,8 +111,20 @@ export const Inbox: React.FC = () => {
     <div className="inbox">
       <div className="inbox-header">
         <h2>Notifications</h2>
+        {/* <div className="header-actions">
+        <PreferencesDialog 
+            preferences={preferences}
+            onPreferenceChange={() => {}}
+          />
+          <button className="action-button">⋯</button>
+        </div> */}
         <div className="header-actions">
-          <button className="action-button">See all</button>
+          <button 
+            onClick={() => setShowPreferences(true)} 
+            className="action-button"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
           <button className="action-button">⋯</button>
         </div>
       </div>
@@ -128,6 +154,13 @@ export const Inbox: React.FC = () => {
           />
         </div>
       </div>
+      {showPreferences && (
+        <PreferencesDialog 
+          preferences={preferences}
+          onPreferenceChange={() => {}}
+          onClose={() => setShowPreferences(false)}
+        />
+      )}
     </div>
   );
 };

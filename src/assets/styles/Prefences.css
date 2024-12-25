@@ -1,0 +1,162 @@
+.preferences-dialog {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  
+  .preferences-header {
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .preferences-header h1 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a202c;
+    margin: 0;
+  }
+  
+  .back-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+  
+  .preferences-content {
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .preference-item {
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .preference-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    cursor: pointer;
+  }
+  
+  .preference-title {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .preference-title h3 {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a202c;
+    margin: 0;
+  }
+  
+  .preference-type {
+    font-size: 12px;
+    color: #718096;
+  }
+  
+  .chevron-icon {
+    width: 20px;
+    height: 20px;
+    color: #718096;
+    transition: transform 0.3s ease;
+  }
+  
+  .chevron-icon.expanded {
+    transform: rotate(180deg);
+  }
+  
+  .preference-toggles {
+    display: none;
+    padding: 0 16px 16px;
+  }
+  
+  .preference-toggles.expanded {
+    display: block;
+  }
+  
+  .toggle-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #1a202c;
+    padding: 4px 0;
+  }
+  
+  .toggle-container:last-child {
+    margin-bottom: 0;
+  }
+  
+  .toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    border: none;
+    border-radius: 12px;
+    background-color: #cbd5e0;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.2s;
+  }
+  
+  .toggle-switch.active {
+    background-color: #3b82f6;
+  }
+  
+  .toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  
+  .toggle-switch.active .toggle-slider {
+    transform: translateX(20px);
+  }
+  
+  .channel-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .channel-icon {
+    width: 16px;
+    height: 16px;
+    color: #64748b;
+  }
+  
+  
