@@ -53,6 +53,19 @@ export const Inbox: React.FC = () => {
     }
   }
 
+  const handlePreferenceChange = async (updatedPreference: any) => {
+    try {
+        const res = await novu.preferences.update({
+          workflowId: updatedPreference.workflow.id || '',
+          channelPreferences: updatedPreference.channels,
+        })
+        console.log('Preference updated:', res.data)
+      await fetchPreferences()
+    } catch (error) {
+      console.error('Error updating preference:', error)
+    }
+  }
+
   const fetchMore = async () => {
     if (hasMore && !isLoading) {
       try {
@@ -72,21 +85,40 @@ export const Inbox: React.FC = () => {
     }
   };
 
+  // useEffect(() => {
+  //   fetchNotifications();
+  //   fetchPreferences();
+
+  //   // Add a listener for new notifications
+  //   const cleanup = novu.on('notifications.notification_received', (newNotification) => {
+  //     // console.log('New notification received:', newNotification);
+  //     setNotifications((prev) => [newNotification, ...prev]);
+  //   });
+
+  //   // Cleanup the listener when the component unmounts
+  //   return () => {
+  //     cleanup();
+  //   };
+  // }, [novu]);
+
   useEffect(() => {
     fetchNotifications();
     fetchPreferences();
-
-    // Add a listener for new notifications
-    const cleanup = novu.on('notifications.notification_received', (newNotification) => {
-      // console.log('New notification received:', newNotification);
+  
+    // Define the event listener
+    const handleNotificationReceived = (newNotification: any) => {
       setNotifications((prev) => [newNotification, ...prev]);
-    });
-
+    };
+  
+    // Add the listener
+    novu.on('notifications.notification_received', handleNotificationReceived);
+  
     // Cleanup the listener when the component unmounts
     return () => {
-      cleanup();
+      novu.off('notifications.notification_received', handleNotificationReceived);
     };
   }, [novu]);
+  
 
   const filteredNotifications = notifications.filter((notification) => {
     switch (activeTab) {
@@ -111,13 +143,6 @@ export const Inbox: React.FC = () => {
     <div className="inbox">
       <div className="inbox-header">
         <h2>Notifications</h2>
-        {/* <div className="header-actions">
-        <PreferencesDialog 
-            preferences={preferences}
-            onPreferenceChange={() => {}}
-          />
-          <button className="action-button">⋯</button>
-        </div> */}
         <div className="header-actions">
           <button 
             onClick={() => setShowPreferences(true)} 
@@ -157,7 +182,7 @@ export const Inbox: React.FC = () => {
       {showPreferences && (
         <PreferencesDialog 
           preferences={preferences}
-          onPreferenceChange={() => {}}
+          onPreferenceChange={handlePreferenceChange}
           onClose={() => setShowPreferences(false)}
         />
       )}

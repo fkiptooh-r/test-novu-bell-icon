@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { useNovu } from '../context/novu-context';
 interface BellButtonProps {
@@ -5,13 +6,33 @@ interface BellButtonProps {
 }
 
 export const BellButton: React.FC<BellButtonProps> = ({ onClick }) => {
-  const novu = useNovu(); // Access the Novu instance via the custom hook
+  const novu = useNovu();
   const [count, setCount] = useState<number>(0);
 
-  // novu.on("notifications.unread_count_changed", (data) => {
-  //   console.log("new unread notifications count =>", data);
-  // });
+  // useEffect(() => {
+  //   const fetchNotificationCount = async () => {
+  //     try {
+  //       const response = await novu.notifications.count({ read: false, archived: false });
+  //       setCount(response.data?.count ?? 0);
+  //     } catch (error) {
+  //       console.error('Error fetching notification count:', error);
+  //     }
+  //   };
 
+  //   fetchNotificationCount();
+
+  //   // Add a listener for unread count changes
+  //  const cleanup = novu.on('notifications.unread_count_changed', (newCount) => {
+  //     // console.log('New unread count:', newCount);
+  //     setCount(newCount.result);
+  //   });
+
+  //   // Cleanup the listener when the component unmounts
+  //   return () => {
+  //     cleanup();
+
+  //   };
+  // }, [novu]);
 
   useEffect(() => {
     const fetchNotificationCount = async () => {
@@ -22,20 +43,23 @@ export const BellButton: React.FC<BellButtonProps> = ({ onClick }) => {
         console.error('Error fetching notification count:', error);
       }
     };
-
+  
     fetchNotificationCount();
-
-    // Add a listener for unread count changes
-    const cleanup = novu.on('notifications.unread_count_changed', (newCount) => {
-      console.log('New unread count:', newCount);
+  
+    // Define the event listener
+    const handleUnreadCountChanged = (newCount: any) => {
       setCount(newCount.result);
-    });
-
+    };
+  
+    // Add the listener
+    novu.on('notifications.unread_count_changed', handleUnreadCountChanged);
+  
     // Cleanup the listener when the component unmounts
     return () => {
-      cleanup();
+      novu.off('notifications.unread_count_changed', handleUnreadCountChanged);
     };
   }, [novu]);
+  
 
   return (
     <button 
